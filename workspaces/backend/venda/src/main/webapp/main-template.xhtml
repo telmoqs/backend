@@ -1,0 +1,119 @@
+<html lang="pt_br" 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+   <meta charset="UTF-8" />
+   <title>Sisgea</title>
+   <link rel="shortcut icon" href="favicon.ico" />
+   <link rel="stylesheet" type="text/css" href="../css/venda.css" />
+   <script type="text/javascript" src="../js/funcoes.js"></script>
+   <ui:insert name="head"></ui:insert>
+</h:head>
+
+<p:dialog modal="true" widgetVar="statusDialog" draggable="false" closable="false" resizable="false">
+   <h:graphicImage value="/imagens/loading.gif" />
+</p:dialog>
+
+
+<h:form id="formulario">
+   <script type="text/javascript">
+          PrimeFaces.locales['pt'] = {
+                    closeText: 'Fechar',
+                    prevText: 'Anterior',
+                    nextText: 'Próximo',
+                    currentText: 'Começo',
+                    monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+                    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                    dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                    weekHeader: 'Semana',
+                    firstDay: 1,
+                    isRTL: false,
+                    showMonthAfterYear: false,
+                    yearSuffix: '',
+                    timeOnlyTitle: 'Horas',
+                    timeText: 'Tempo',
+                    hourText: 'Hora',
+                    minuteText: 'Minuto',
+                    secondText: 'Segundo',
+                    currentText: 'Data/Hora Atual',
+                    ampm: false,
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia',
+                    allDayText : 'Todo Dia'
+             };
+      </script>
+   <p:menubar autoSubmenuDisplay="true">
+   
+      <p:menuitem style="float: right;" >
+      	<h:panelGrid columns="7" style="font-size: 12px; float: right; text-align: right;" styleClass="fonteSisgea">
+		   <h:outputText style="font-size: 12px; color: #696969 !important;" value=" Seja bem vindo:"/>
+		   <h:outputText style="font-size: 12px; color: #0000FF !important;" value="#{PessoaControl.nomeUsuarioLogado}"/>
+		   
+		   <h:outputText style="font-size: 12px; color: #696969 !important;" value="IP:"/>
+		   <h:outputText style="font-size: 12px; color: #0000FF !important;" value="#{PessoaControl.ip}"/>
+		   
+      	</h:panelGrid>
+      </p:menuitem>
+	  <p:menuitem value="Sair" ajax="false" icon="ui-icon ui-icon-power" url="../sair.jsp" action="#{MenuControlador.logout}" />
+    
+   	  <p:separator />
+	  
+      <p:submenu label="Cadastros" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente']}" icon="ui-icon ui-icon-plusthick">
+         <p:menuitem value="Pessoa" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente']}"  actionListener="#{MenuControlador.gerenciarSessao}" action="Pessoa.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+         <p:menuitem value="Discente" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Discente.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+         <p:menuitem value="Docente" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Docente.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+         <p:menuitem value="Coordenador" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Coordenador.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+         <p:menuitem value="Curso" rendered="#{securityScope.userInRole['Admin,Coordenador']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Curso.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+         <p:menuitem value="Disciplina" rendered="#{securityScope.userInRole['Admin,Coordenador']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Disciplina.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+         <p:menuitem value="Laboratório" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Laboratorio.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+         <p:menuitem value="Sala" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Sala.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+      	 <p:menuitem value="Horário" rendered="#{securityScope.userInRole['Admin,Coordenador']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Horario.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+      	 <p:menuitem value="Turma" rendered="#{securityScope.userInRole['Admin,Coordenador']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Turma.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+      </p:submenu>
+      
+      <p:submenu label="Relatórios" icon="ui-icon ui-icon-script">
+      </p:submenu>
+      
+      <p:submenu label="Opções" icon="ui-icon ui-icon-eject">
+         <p:menuitem value="Ajuda" icon="ui-icon ui-icon-help"></p:menuitem>
+      </p:submenu>
+      
+      <p:submenu label="Usuário" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente,Discente']}" icon="ui-icon ui-icon-eject" > 
+  		<p:menuitem value="Alterar Senha" rendered="#{securityScope.userInRole['Admin,Coordenador,Docente,Discente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="PessoaAlterarSenha.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+      </p:submenu>
+      
+      <p:submenu label="Usuário" rendered="#{securityScope.userInRole['Candidato']}" icon="ui-icon ui-icon-eject" > 
+  		<p:menuitem value="Alterar Senha" rendered="#{securityScope.userInRole['Candidato']}" actionListener="#{MenuControlador.gerenciarSessao}" action="PessoaAlterarSenha.xhtml" ajax="false" icon="ui-icon ui-icon-person" />
+      </p:submenu>
+      
+      <p:submenu label="Início" rendered="#{securityScope.userInRole['Discente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="Pessoa.xhtml" ajax="false" icon="ui-icon ui-icon-person"  />
+      
+      <p:submenu label="Dados Pessoais" rendered="#{securityScope.userInRole['Discente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="DiscenteDadosPessoais.xhtml" ajax="false" icon="ui-icon ui-icon-person"  />
+      
+      <p:submenu label="Notas" rendered="#{securityScope.userInRole['Discente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="ListaNota.xhtml" ajax="false" icon="ui-icon ui-icon-person"  />
+      
+      <p:submenu label="Frequência" rendered="#{securityScope.userInRole['Discente']}" actionListener="#{MenuControlador.gerenciarSessao}" action="ListaFrequencia.xhtml" ajax="false" icon="ui-icon ui-icon-person"  />
+ 
+
+   </p:menubar>
+
+   <p:messages id="growl" showDetail="false" autoUpdate="true" />
+   <p:panel id="painel" header="#{mbean.titulo}" style="width: 95%; margin: 05 auto; border-radius:10px; box-shadow: rgba(0,0,0,0.4) 10px 10px; border: 1px solid bluegray;">
+      <ui:insert name="body">
+      </ui:insert>
+   </p:panel>
+   <p:remoteCommand update="@form" name="atualizarFormulario" />
+</h:form>
+
+<ui:insert name="footer">
+   <div id="footer" style="width: 95%; margin: 0 auto; text-align: center; font-size: 12px !important;">Sisgea © 2012 - Sistema de Gestão Acadêmico</div>
+</ui:insert>
+
+</html>

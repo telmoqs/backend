@@ -1,0 +1,327 @@
+<ui:composition template="main-template.xhtml"
+   xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:h="http://java.sun.com/jsf/html"
+   xmlns:p="http://primefaces.org/ui">
+   
+   <ui:param name="mbean" value="#{pessoaControle}" />
+
+   <ui:define name="body">
+      <h:panelGroup >
+         <p:panel id="dadosConsulta" header="Dados para Consulta">
+            <h:panelGrid columns="2" styleClass="fonteSisgea">
+               <h:outputText value="Nome:" />
+               <p:inputText value="#{pessoaControle.pessoa.nome}" />
+
+               <h:outputText value="CPF:" />
+               <p:inputText value="#{pessoaControle.pessoa.cpf}" onkeypress="fcSaltaTAB(this, 13);" maxlength="14" onBlur="javascript:validaCPF(this), formataCPF(this);" onkeyup="javascript:maskCPF(this)" converter="CpfConverter" />
+
+            </h:panelGrid>
+            <br />
+            <p:commandButton value="Listar" action="#{pessoaControle.atualizarLista}" update="tabelaPessoa" process="dadosConsulta" title="Listar Pessoas [Discente, Docente, Coordenador, Candidato]" />
+
+         </p:panel>
+
+         <p:dataTable var="pessoa" value="#{pessoaControle.pessoas}" id="tabelaPessoa" paginator="true" rows="10" paginatorPosition="bottom"
+            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="10,20,30" emptyMessage="Nenhum registro na lista">
+           
+            <p:column rendered="#{pessoa.id > 0}" styleClass="fonteSisgea">
+               <f:facet name="header">
+                  <h:outputText value="Nome" />
+               </f:facet>
+               <h:outputText value="#{pessoa.nome}" />
+            </p:column>
+          
+            <p:column rendered="#{pessoa.id > 0}" styleClass="fonteSisgea" style="text-align: center;">
+               <f:facet name="header">
+                  <h:outputText value="CPF" />
+               </f:facet>
+               <h:outputText value="#{pessoa.cpf}" converter="CpfConverter" />
+            </p:column>
+          
+            <p:column rendered="#{pessoa.id > 0}" styleClass="fonteSisgea" style="text-align: center;">
+               <f:facet name="header">
+                  <h:outputText value="RG" />
+               </f:facet>
+               <h:outputText value="#{pessoa.rg}" />
+            </p:column>
+          
+            <p:column rendered="#{pessoa.id > 0}" styleClass="fonteSisgea" style="text-align: center;">
+               <f:facet name="header">
+                  <h:outputText value="Data de Nascimento" />
+               </f:facet>
+               <h:outputText value="#{pessoa.dataNascimento}">
+                  <f:convertDateTime pattern="dd/MM/yyyy" />
+               </h:outputText>
+            </p:column>
+          
+            <p:column rendered="#{pessoa.id > 0}" styleClass="fonteSisgea" style="text-align: center;">
+               <f:facet name="header">
+                  <h:outputText value="Sexo" />
+               </f:facet>
+               <h:outputText value="#{pessoa.sexo.descricao}" />
+            </p:column>
+          
+            <p:column styleClass="fonteSisgea" style="text-align: center;  width:70px;">
+               <f:facet name="header">
+                  <h:outputText value="" />
+               </f:facet>
+               <p:commandLink action="#{pessoaControle.telaAlterar}" update="@form" title="Alterar">
+                  <h:graphicImage url="/imagens/icon-edit.png" />
+                  <f:setPropertyActionListener value="#{pessoa}" target="#{pessoaControle.pessoa}" />
+               </p:commandLink>
+               <p:commandLink action="#{pessoaControle.telaConsultar}" update="@form" title="Consultar">
+                  <h:graphicImage url="/imagens/icon-view.png" />
+                  <f:setPropertyActionListener value="#{pessoa}" target="#{pessoaControle.pessoa}" />
+               </p:commandLink>
+            </p:column>
+         </p:dataTable>
+         <br />
+         <p:commandButton process="@this" value="Novo" action="#{pessoaControle.telaIncluir}" update="@form" />
+
+      </h:panelGroup>
+
+      <h:panelGroup rendered="#{pessoaControle.ehTelaCadastro}">
+         <p:panel>
+            <h:panelGrid columns="2" styleClass="fonteSisgea">
+               <h:outputLabel value="Tipo Pessoa?" />
+               <p:selectOneRadio value="#{pessoaControle.pessoa.tipoPessoa}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                  <p:ajax update="@form" event="change" process="@form" />
+                  <f:selectItems value="#{ControleEnumerador.listaEnumTipoPessoa}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+               </p:selectOneRadio>
+
+               <h:outputText value="Perfil?" />
+               <p:selectOneRadio value="#{pessoaControle.pessoa.perfil}" disabled="#{pessoaControle.ehAcaoConsultar or pessoaControle.pessoa.tipoPessoa.abreviado == 'PJ'}">
+                  <p:ajax event="change" update="@form" />
+                  <f:selectItems value="#{ControleEnumerador.listaEnumPerfil}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+               </p:selectOneRadio>
+
+               <h:outputText value="E-Mail:" />
+               <p:inputText value="#{pessoaControle.pessoa.email}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+               <h:outputText value="Permitir Envio?" />
+               <p:selectOneRadio value="#{pessoaControle.pessoa.permitirEnvioEmail}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                  <f:selectItems value="#{ControleEnumerador.listaEnumSimNao}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+               </p:selectOneRadio>
+
+               <h:outputLabel value="Digite uma Senha:" rendered="#{!pessoaControle.ehAcaoConsultar}" />
+               <p:password value="#{pessoaControle.pessoa.senha}" disabled="#{pessoaControle.ehAcaoConsultar}" rendered="#{!pessoaControle.ehAcaoConsultar}" style="width: 160pt !important;" />
+
+            </h:panelGrid>
+
+            <p:tabView dynamic="true">
+               <p:tab title="Pessoa Física" rendered="#{pessoaControle.pessoa.tipoPessoa.abreviado == 'PF'}">
+                  <h:panelGrid columns="2" styleClass="fonteSisgea">
+                     <h:outputText value="Nome:" />
+                     <p:inputText value="#{pessoaControle.pessoa.nome}" disabled="#{pessoaControle.ehAcaoConsultar}" maxlength="50" style="width: 160pt !important;" />
+
+                     <h:outputText value="Nome da Mãe:" />
+                     <p:inputText value="#{pessoaControle.pessoa.nomeMae}" disabled="#{pessoaControle.ehAcaoConsultar}" maxlength="50" style="width: 160pt !important;" />
+
+                     <h:outputText value="Nome do Pai:" />
+                     <p:inputText value="#{pessoaControle.pessoa.nomePai}" disabled="#{pessoaControle.ehAcaoConsultar}" maxlength="50" style="width: 160pt !important;" />
+
+                     <h:outputText value="CPF:" />
+                     <p:inputText value="#{pessoaControle.pessoa.cpf}" disabled="#{pessoaControle.ehAcaoConsultar}" onkeypress="fcSaltaTAB(this, 13);" maxlength="14" onBlur="javascript:validaCPF(this), formataCPF(this);"
+                        onkeyup="javascript:maskCPF(this)" style="width: 150pt !important;" converter="CpfConverter" />
+
+                     <h:outputText value="RG:" />
+                     <p:inputText value="#{pessoaControle.pessoa.rg}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <h:outputText value="Data Expedição RG:" />
+                     <p:calendar value="#{pessoaControle.pessoa.dataExpedicaoRG}" onkeypress="fcSaltaTAB(this, 9);" maxlength="10" onkeyup="maskData(this)" converterMessage="Data inválida" pattern="dd/MM/yyyy" navigator="true" locale="pt"
+                        disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <h:outputText value="Órgão RG:" />
+                     <p:selectOneMenu value="#{pessoaControle.pessoa.orgaoRG}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                        <f:selectItems value="#{ControleEnumerador.listaEnumOrgaoRG}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+                     </p:selectOneMenu>
+
+                     <h:outputText value="UF - RG:" />
+                     <p:selectOneMenu value="#{pessoaControle.pessoa.ufExpedicaoRg}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                        <f:selectItems value="#{ControleEnumerador.listaEnumUf}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+                     </p:selectOneMenu>
+
+                     <h:outputText value="Data Nascimento:" />
+                     <p:calendar value="#{pessoaControle.pessoa.dataNascimento}" onkeypress="fcSaltaTAB(this, 9);" maxlength="10" onkeyup="maskData(this)" converterMessage="Data inválida" pattern="dd/MM/yyyy" navigator="true" locale="pt"
+                        disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <h:outputText value="Sexo:" />
+                     <p:selectOneRadio value="#{pessoaControle.pessoa.sexo}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                        <f:selectItems value="#{ControleEnumerador.listaEnumSexo}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+                     </p:selectOneRadio>
+
+                     <h:outputText value="Estado Civil:" />
+                     <p:selectOneMenu value="#{pessoaControle.pessoa.estadoCivil}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                        <f:selectItems value="#{ControleEnumerador.listaEnumEstadoCivil}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+                     </p:selectOneMenu>
+
+                     <h:outputText value="NecessidadeEspecial:" />
+                     <p:selectOneMenu value="#{pessoaControle.pessoa.necessidadeEspecial}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                        <f:selectItems value="#{ControleEnumerador.listaEnumNecessidadeEspecial}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+                     </p:selectOneMenu>
+
+                     <h:outputText value="Escolaridade:" />
+                     <p:selectOneMenu value="#{pessoaControle.pessoa.escolaridade}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                        <f:selectItems value="#{ControleEnumerador.listaEnumEscolaridade}" />
+                     </p:selectOneMenu>
+                  </h:panelGrid>
+               </p:tab>
+
+               <p:tab title="Endereço" id="end">
+                  <h:panelGrid columns="2" styleClass="fonteSisgea">
+                     <h:outputLabel value="Endereço:" for="txt_endereco" />
+                     <p:inputText id="txt_endereco" value="#{pessoaControle.pessoa.endereco.logradouro}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <h:outputLabel value="Número:" for="txt_numero" />
+                     <p:inputText id="txt_numero" value="#{pessoaControle.pessoa.endereco.numero}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <h:outputLabel value="Bairro:" for="txt_bairro" />
+                     <p:inputText id="txt_bairro" value="#{pessoaControle.pessoa.endereco.bairro}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <h:outputLabel value="Município:" for="txt_municipio" />
+                     <p:inputText id="txt_municipio" value="#{pessoaControle.pessoa.endereco.municipio.descricao}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <h:outputText value="UF - Município:" />
+                     <p:selectOneMenu value="#{pessoaControle.pessoa.endereco.municipio.uf}" disabled="#{pessoaControle.ehAcaoConsultar}">
+                        <f:selectItems value="#{ControleEnumerador.listaEnumUf}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+                     </p:selectOneMenu>
+
+                     <h:outputLabel value="CEP:" for="txt_cep" />
+                     <p:inputText id="txt_cep" value="#{pessoaControle.pessoa.endereco.cep}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <p:commandButton process="@this" value="Limpar Campos" type="reset" />
+                     <p:commandButton value="Adicionar" update="enderecosTable" process="end" action="#{pessoaControle.limparEndereco}">
+                        <p:collector value="#{pessoaControle.pessoa.endereco}" addTo="#{pessoaControle.pessoa.enderecos}" />
+                     </p:commandButton>
+                  </h:panelGrid>
+
+                  <br />
+
+                  <p:dataTable id="enderecosTable" value="#{pessoaControle.pessoa.enderecosLista}" var="endereco" emptyMessage="Nenhum registro na lista">
+
+                     <p:column style="font-size: 12px;">
+                        <f:facet name="header">
+                           <h:outputText value="Endereco" />
+                        </f:facet>
+                        <h:outputText value="#{endereco.logradouro}" />
+                     </p:column>
+
+                     <p:column style="font-size: 12px; text-align: center;">
+                        <f:facet name="header">
+                           <h:outputText value="Bairro" />
+                        </f:facet>
+                        <h:outputText value="#{endereco.bairro}" />
+                     </p:column>
+
+                     <p:column style="font-size: 12px; text-align: center;">
+                        <f:facet name="header">
+                           <h:outputText value="CEP" />
+                        </f:facet>
+                        <h:outputText value="#{endereco.cep}" />
+                     </p:column>
+
+                     <p:column style="font-size: 12px; text-align: center;">
+                        <p:commandLink value="Remover" update="enderecosTable" process="enderecosTable" disabled="#{pessoaControle.ehAcaoConsultar}">
+                           <p:collector value="#{endereco}" removeFrom="#{pessoaControle.pessoa.enderecos}" />
+                        </p:commandLink>
+                     </p:column>
+                  </p:dataTable>
+               </p:tab>
+
+               <br />
+
+               <p:tab title="Telefone" id="tel">
+                  <h:panelGrid columns="2" styleClass="fonteSisgea">
+                     <h:outputLabel value="Número:" for="txt_numero_tel" />
+                     <p:inputText id="txt_numero_tel" value="#{pessoaControle.pessoa.telefone.numero}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <h:outputLabel value="Contato:" for="txt_contato" />
+                     <p:inputText id="txt_contato" value="#{pessoaControle.pessoa.telefone.contato}" disabled="#{pessoaControle.ehAcaoConsultar}" />
+
+                     <p:commandButton process="@this" value="Limpar Campos" type="reset" />
+                     <p:commandButton id="btn_add_tel" value="Adicionar" update="telefonesTable" process="tel" action="#{pessoaControle.limparTelefone}">
+                        <p:collector value="#{pessoaControle.pessoa.telefone}" addTo="#{pessoaControle.pessoa.telefones}" />
+                     </p:commandButton>
+                  </h:panelGrid>
+
+                  <br />
+
+                  <p:dataTable id="telefonesTable" value="#{pessoaControle.pessoa.telefonesLista}" var="telefone" emptyMessage="Nenhum registro na lista">
+
+                     <p:column style="font-size: 12px; text-align: center;">
+                        <f:facet name="header">
+                           <h:outputText value="Número" />
+                        </f:facet>
+                        <h:outputText value="#{telefone.numero}" />
+                     </p:column>
+
+                     <p:column style="font-size: 12px; text-align: center;">
+                        <f:facet name="header">
+                           <h:outputText value="Contato" />
+                        </f:facet>
+                        <h:outputText value="#{telefone.contato}" />
+                     </p:column>
+
+                     <p:column style="font-size: 12px; text-align: center;">
+                        <p:commandLink value="Remover" update="telefonesTable" process="telefonesTable" disabled="#{pessoaControle.ehAcaoConsultar}">
+                           <p:collector value="#{telefone}" removeFrom="#{pessoaControle.pessoa.telefones}" />
+                        </p:commandLink>
+                     </p:column>
+                  </p:dataTable>
+               </p:tab>
+
+               <p:tab title="Cursos" rendered="#{pessoaControle.pessoa.perfil.abreviado == '4' and pessoaControle.pessoa.tipoPessoa.abreviado == 'PF'}">
+                  <h:panelGrid columns="2">
+                     <p:dataTable id="tabelaCursos" var="curso" value="#{pessoaControle.cursos}" emptyMessage="Nenhum registro na lista" paginator="true" rows="10" paginatorPosition="bottom"
+                        paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="10,20,30" selection="#{pessoaControle.cursosSelecionados}"
+                        rowKey="#{curso.id}">
+
+                        <p:column selectionMode="multiple" disabledSelection="#{pessoaControle.ehAcaoConsultar}" />
+
+                        <p:column filterBy="#{curso.descricao}" headerText="Descrição" filterMatchMode="contains" sortBy="#{curso.descricao}">
+                           <h:outputText value="#{curso.descricao}" />
+                        </p:column>
+                     </p:dataTable>
+                  </h:panelGrid>
+               </p:tab>
+
+               <p:tab title="Disciplinas" rendered="#{pessoaControle.pessoa.perfil.abreviado == '2' and pessoaControle.pessoa.tipoPessoa.abreviado == 'PF'}">
+                  <h:panelGrid columns="2">
+                     <p:dataTable id="tabelaDisciplinas" var="disciplina" value="#{pessoaControle.disciplinas}" emptyMessage="Nenhum registro na lista" paginator="true" rows="10" paginatorPosition="bottom"
+                        paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="10,20,30" selection="#{pessoaControle.disciplinasSelecionadas}"
+                        rowKey="#{disciplina.id}">
+
+                        <p:column selectionMode="multiple" disabledSelection="#{pessoaControle.ehAcaoConsultar}" />
+
+                        <p:column filterBy="#{disciplina.descricao}" headerText="Descrição" filterMatchMode="contains" sortBy="#{disciplina.descricao}" disabledSelection="#{pessoaControle.ehAcaoConsultar}">
+                           <h:outputText value="#{disciplina.descricao}" />
+                        </p:column>
+                     </p:dataTable>
+                  </h:panelGrid>
+               </p:tab>
+
+               <p:tab title="Cursos" rendered="#{pessoaControle.pessoa.perfil.abreviado == '1' or pessoaControle.pessoa.perfil.abreviado == '3' and pessoaControle.pessoa.tipoPessoa.abreviado == 'PF'}">
+                  <h:panelGrid columns="2">
+                     <p:dataTable id="curso" var="curso" value="#{pessoaControle.cursos}" rowKey="#{curso.id}" paginator="true" rows="10" selection="#{pessoaControle.cursoSelecionado}">
+
+                        <p:column selectionMode="single" style="width:18px" />
+
+                        <p:column filterBy="#{curso.descricao}" headerText="Descrição" filterMatchMode="contains" sortBy="#{curso.descricao}">
+                           <h:outputText value="#{curso.descricao}" />
+                        </p:column>
+                     </p:dataTable>
+                  </h:panelGrid>
+               </p:tab>
+
+            </p:tabView>
+         </p:panel>
+         <h:panelGrid columns="2">
+            <p:commandButton process="@this" value="Incluir" action="#{pessoaControle.incluir}" update="@form" rendered="#{pessoaControle.ehAcaoIncluir}" />
+            <p:commandButton process="@this" value="Alterar" action="#{pessoaControle.alterar}" update="@form" rendered="#{pessoaControle.ehAcaoAlterar}" />
+            <p:commandButton process="@this" value="Voltar" action="#{pessoaControle.telaListar}" update="@form" />
+         </h:panelGrid>
+      </h:panelGroup>
+   </ui:define>
+</ui:composition>

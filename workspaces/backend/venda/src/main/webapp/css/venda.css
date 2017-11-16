@@ -1,0 +1,109 @@
+body {
+	margin: 0px;
+	padding: 0px;
+	font-size: 12px !important;
+}
+
+.fonteSisgea{
+	font-size: 12px !important;
+}
+
+.C {
+	text-align: center;
+}
+
+.E {
+	text-align: left;
+}
+
+.D {
+	text-align: right;
+}
+
+.ui-widget,.ui-widget .ui-widget {
+	font-size: 12px !important;
+}
+
+.gridRh div th {
+	cursor: pointer;
+}
+
+input[readonly="true"],input[readonly],input[readonly="readonly"],input[disabled="disabled"]
+	{
+	background-color: #CCC !important;
+}
+
+input[type="text"],textarea {
+	width: 160pt !important;
+}
+
+.selectClass {
+	width: 167.5pt !important;
+	height: 19pt !important;
+}
+
+.retornoPopup {
+	font-size: 13pt;
+}
+
+#banner {
+	height: 93px;
+	background: url(../imagens/banner.jpg);
+}
+
+#breadcrumbs {
+	height: 05px;
+	background-image: url(../imagens/breadcrumbs.jpg);
+	padding: 0px 10px 10px 20px;
+}
+
+.rowRoxo {
+    background-color:#333399
+}
+
+.tabelaRich500{
+	background-color:#CCCCFF;
+	text-align:center;
+        width:100%;
+	padding:0px;
+	margin:0px;
+        border-width:0px;
+	border-spacing:0px;
+	border-style:outset;
+	border-top-color: #CCCCFF;
+	border-left-color: #CCCCFF;
+	border-right-color: #CCCCFF;
+	border-bottom-color: #CCCCFF;
+}
+
+.titulosTabelas {
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	cellspacing: 5px;
+	padding: 5px;
+}
+
+.labels{
+	color: black;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
+#cabecalho{
+	margin: -30px 40px 20px 40px;
+	background-image: url(../imagens/bg_topo.gif);
+	backgroud-repeat: no repeat;
+	height: 130px;
+}
+#cabecalho h2{
+	text-align: center;
+	color: #ffffff;
+	padding: 50px 20px 20px 80px;
+	font-size: 30px;
+}
+#home{
+	margin: -50px 40px 10px 40px;
+}
